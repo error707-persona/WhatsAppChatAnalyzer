@@ -2,6 +2,7 @@ import streamlit as st
 import preprocessor, helper
 import matplotlib.pyplot as plt
 from matplotlib.font_manager import FontProperties
+import seaborn as sns
 
 prop = FontProperties(fname='/System/Library/Fonts/Apple Color Emoji.ttc')
 plt.rcParams['font.family'] = prop.get_family()
@@ -27,7 +28,7 @@ if uploaded_file is not None:
     num_messages, words, num_media, num_links = helper.fetch_stats(selected_user, df)
     with col1:
 
-        st.subheader("Total Messages")
+        st.header("Total Messages")
         st.title(num_messages)
 
     with col2:
@@ -42,7 +43,40 @@ if uploaded_file is not None:
         st.header('Links Shared')
         st.title(num_links)
 
-    # timeline
+    # message count analysis
+    st.title('Activity Map')
+    col1, col2 = st.columns(2, gap="large")
+
+    # monthly_timeline
+    with col1:
+        st.header("Monthly Analysis")
+        timeline = helper.monthly_timeline(selected_user, df)
+        fig, ax = plt.subplots()
+        ax.plot(timeline['time'], timeline['message'], color="pink")
+        plt.xticks(rotation='vertical')
+        st.pyplot(fig)
+
+
+    # daily_timeline
+
+        # st.subheader("Daily Activity Report")
+        # daily_timeline = helper.daily_timeline(selected_user, df)
+        # fig, ax = plt.subplots()
+        # ax.plot(daily_timeline['only_date'], daily_timeline['message'], color="green")
+        # plt.xticks(rotation='vertical')
+        # st.pyplot(fig)
+
+    # weekday_analysis
+    with col2:
+        st.header("Weekday Analysis")
+        weekday_activity = helper.week_activity_map(selected_user, df)
+        fig, ax = plt.subplots()
+        ax.bar(weekday_activity['day_name'], weekday_activity['count'], color="green")
+        plt.xticks(rotation='vertical')
+        st.pyplot(fig)
+
+
+
 
 
     if selected_user == 'Overall':
@@ -96,6 +130,12 @@ if uploaded_file is not None:
         fig, ax = plt.subplots()
         ax.pie(emoji_df[1].head(), labels=emoji_df[0].head(), autopct="%0.2f")
         st.pyplot(fig)
+
+    st.title("Weekly Activity Map")
+    user_heatmap = helper.activity_heatmap(selected_user, df)
+    fig,ax = plt.subplots()
+    ax = sns.heatmap(user_heatmap)
+    st.pyplot(fig)
 
 
 

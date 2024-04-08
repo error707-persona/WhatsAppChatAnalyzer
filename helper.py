@@ -80,8 +80,31 @@ def monthly_timeline(selected_user, df):
     timeline = df.groupby(['year', 'month_num', 'month']).count()['message'].reset_index()
 
     
+    time = []
+    for i in range(timeline.shape[0]):
+        time.append(timeline['month'][i] + "-" + str(timeline['year'][i]))
+
+    timeline['time'] = time
+    return timeline
 
 
+def daily_timeline(selected_user, df):
+    if selected_user != 'Overall':
+        df = df[df['user'] == selected_user]
+    timeline = df.groupby('only_date').count()['message'].reset_index()
+    return timeline
+
+
+def week_activity_map(selected_user, df):
+    if selected_user != 'Overall':
+        df = df[df['user'] == selected_user]
+    return df['day_name'].value_counts().reset_index()
+
+def activity_heatmap(selected_user, df):
+    if selected_user != 'Overall':
+        df = df[df['user'] == selected_user]
+    activity_heatmap = df.pivot_table(index='day_name', columns='period', values='message', aggfunc='count').fillna(0)
+    return activity_heatmap
 
 
 
